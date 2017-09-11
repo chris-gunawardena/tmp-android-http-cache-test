@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-            File httpCacheDir = new File(this.getCacheDir(), "http9");
+            File httpCacheDir = new File(this.getCacheDir(), "http_cache" + (int)(Math.random() * 10000));
             long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
             HttpResponseCache.install(httpCacheDir, httpCacheSize);
         } catch (IOException e) {
@@ -33,21 +33,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        for(int i=0; i<2; i++) {
-            Log.i("i", i + "");
-            Thread thread = new Thread(new Runnable(){
-                @Override
-                public void run(){
-                    try{
-                        Log.i("x", downloadUrl("http://mqtt.chris.gunawardena.id.au/wp-content/uploads/cache_test.php"));
-                        Log.i("x", downloadUrl("http://mobileapi.jumbo.com/v2/autocomplete"));
-                    } catch (Exception e) {
-                        Log.e("x", "IOException", e);
-                    }
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run(){
+                try{
+                    Log.i("x", downloadUrl("http://mqtt.chris.gunawardena.id.au/wp-content/uploads/cache_test.php"));
+                    Log.i("x", downloadUrl("http://mqtt.chris.gunawardena.id.au/wp-content/uploads/cache_test.php"));
+                    Log.i("x", downloadUrl("http://mobileapi.jumbo.com/v2/autocomplete"));
+                    Log.i("x", downloadUrl("http://mobileapi.jumbo.com/v2/autocomplete"));
+                } catch (Exception e) {
+                    Log.e("x", "IOException", e);
                 }
-            });
-            thread.start();
-        }
+            }
+        });
+        thread.start();
     }
     private String readStream(InputStream is) {
         try {
@@ -104,40 +103,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return result;
-    }
-
-    String getUrl(String uri) {
-        BufferedReader rd  = null;
-        StringBuilder sb = null;
-        String line = null;
-        URL url = null;
-        HttpURLConnection connection = null;
-
-        try {
-            url = new URL(uri);
-            connection = (HttpURLConnection)url.openConnection();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream in = connection.getInputStream();
-
-            if(connection.getResponseCode() != HttpURLConnection.HTTP_OK)
-                return null;
-
-            int bytesRead = 0;
-            byte[] buffer = new byte[1024];
-            while((bytesRead = in.read(buffer)) > 0){
-                out.write(buffer, 0, bytesRead);
-            }
-            out.close();
-            return out.toString();
-        }
-        catch(Exception e) {
-            Log.e("eeee", "exception");
-        }
-        finally {
-            if(connection!=null)
-                connection.disconnect();
-        }
-        return "";
     }
 
     @Override
